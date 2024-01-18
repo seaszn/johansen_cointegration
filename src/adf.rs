@@ -1,12 +1,10 @@
-use crate::data::Series;
+use crate::data::{Series, FloatSeries};
 
 pub enum AdfConfidence {
     _90,
     _95,
     _99,
 }
-
-type FloatSeries = Series<f64>;
 
 pub trait ADF<T, RHS = Series<T>> {
     fn perform_adf(

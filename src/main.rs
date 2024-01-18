@@ -1,4 +1,4 @@
-use data::TimeSeries;
+use data::{RollingWindow, TimeSeries};
 
 use crate::adf::ADF;
 mod adf;
@@ -21,18 +21,17 @@ fn main() {
 }
 
 fn test_cointegration() -> Result<(), Box<dyn std::error::Error>> {
-    // let window_size = 100;
-    let solusd = market::stream::from_file("./_temp/SOLUSD.csv")?
-        .close()
-        .take_last(100);
+    let window_size = 100;
+    let solusd = market::stream::from_file("./_temp/SOLUSD.csv")?.close();
     // let soleth = market::stream::from_file("./_temp/SOLETH.csv")?.close();
     // let coefficient: Vec<f64> = solusd.iter().zip(&soleth).map(|(&a, &b)| a / b).collect();
 
-    if let Ok((test_statistic, critical_value, nobs)) = solusd.perform_adf(0, adf::AdfConfidence::_90) {
-        println!("{}", test_statistic);
-        println!("{}", critical_value);
-        println!("{}", nobs);
-        println!("{}", test_statistic < critical_value);
+    for series in RollingWindow::from(&solusd, window_size) {
+        if let Ok((_test_statistic, _critical_value, _sample_size)) =
+            series.perform_adf(0, adf::AdfConfidence::_90)
+        {
+            // println!("{}", test_statistic < critical_value);
+        }
     }
 
     // let mut lag = 0;
