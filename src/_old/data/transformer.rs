@@ -1,6 +1,5 @@
 // use super::types::OHLC;
 
-
 // pub fn transform_ohlc(data: &Vec<OHLC>) -> Vec<OHLC> {
 //     return sanitize_ohlc(data)
 //         .iter()
@@ -13,7 +12,7 @@
 
 //             let y_3 = (open_proxy / (1.0 - open_proxy)).log2();
 //             let y_4 = (close_proxy / (1.0 - close_proxy)).log2();
-//             return OHLC::from([y_1, y_2, y_3, y_4]);
+//             return OHLC::new(y_1, y_2, y_3, y_4, x.time_string());
 //         })
 //         .collect();
 // }
@@ -30,7 +29,7 @@
 
 //             let open = open_proxy * high + (1.0 - open_proxy) * low;
 //             let close = close_proxy * high + (1.0 - close_proxy) * low;
-//             return OHLC::from([open, high, low, close]);
+//             return OHLC::new(open, high, low, close, x.time_string());
 //         })
 //         .collect();
 // }

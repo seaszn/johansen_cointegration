@@ -1,7 +1,9 @@
-use data::{math::adf, reader};
-use util::vec::take_last;
+use data::TimeSeries;
+
+use crate::adf::ADF;
+mod adf;
 mod data;
-mod util;
+mod market;
 
 fn main() {
     if let Err(e) = test_cointegration() {
@@ -19,21 +21,35 @@ fn main() {
 }
 
 fn test_cointegration() -> Result<(), Box<dyn std::error::Error>> {
-    let window_size = 20;
-    let _sol_usd = take_last(reader::read_from_file("./_temp/SOLUSD.csv")?, window_size);
-    let _sol_eth = take_last(reader::read_from_file("./_temp/SOLETH.csv")?, window_size);
+    // let window_size = 100;
+    let solusd = market::stream::from_file("./_temp/SOLUSD.csv")?
+        .close()
+        .take_last(100);
+    // let soleth = market::stream::from_file("./_temp/SOLETH.csv")?.close();
+    // let coefficient: Vec<f64> = solusd.iter().zip(&soleth).map(|(&a, &b)| a / b).collect();
 
-    let _sol_usd_close: Vec<f64> = _sol_eth.iter().map(|x| *x.close()).collect();
-    let beta = adf::calc(&_sol_usd_close);
-    let significance_level = 0.05f64;
-
-    if beta < significance_level {
-        // data is non-stationary
-        println!("non-stationary, take 1 order difference")
-    } else {
-        println!("stationary, perform johansen cointegration")
-        // data is stationary
+    if let Ok((test_statistic, critical_value, nobs)) = solusd.perform_adf(0, adf::AdfConfidence::_90) {
+        println!("{}", test_statistic);
+        println!("{}", critical_value);
+        println!("{}", nobs);
+        println!("{}", test_statistic < critical_value);
     }
+
+    // let mut lag = 0;
+    // let mut beta = 0.0;
+    // let mut price_data = take_last(&original_data, window_size);
+    // while beta > significance_level || lag == 0 {
+    //     (_, beta) = adf::calc(&price_data);
+
+    //     if beta > significance_level {
+    //         lag += 1;
+    //         price_data = difference(&take_last(&original_data, window_size + lag), lag);
+    //     } else {
+    //         break;
+    //     }
+    // }
+
+    // println!("time series stationary with differencing of {}", lag);
 
     return Ok(());
 }

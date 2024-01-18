@@ -1,6 +1,5 @@
 // mod linear::linear;
 pub mod adf;
-pub mod matrix;
 
 // #[derive(Debug, Clone)]
 // pub struct RegressionResult {
