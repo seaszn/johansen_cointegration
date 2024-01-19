@@ -24,17 +24,21 @@ fn test_cointegration() -> Result<(), Box<dyn std::error::Error>> {
     let window_size = 100;
     let max_lag_order = 80;
     let solusd = market::stream::from_file("./_temp/SOLUSD.csv")?.close();
-    // let soleth = market::stream::from_file("./_temp/SOLETH.csv")?.close();
+    let soleth = market::stream::from_file("./_temp/SOLETH.csv")?.close();
     // let coefficient: Vec<f64> = solusd.iter().zip(&soleth).map(|(&a, &b)| a / b).collect();
     // run 2 different time series parralel, syncing the lag
 
-    let window = RollingWindow::from(&solusd, window_size);
-    for series in window {
-        if let Ok((_test_statistic, _critical_value, _sample_size)) =
-            series.perform_adf(0, adf::AdfConfidence::_90)
-        {
-            println!("{}", _test_statistic < _critical_value);
-        }
+    let usd_nominated = RollingWindow::from(&solusd, window_size);
+    let eth_nominated = RollingWindow::from(&soleth, window_size);
+    for (nominal, relative) in usd_nominated.zip(eth_nominated) {
+        let nom_adf = &nominal.perform_adf(0, adf::AdfConfidence::_90)?;
+        let rel_adf = &relative.perform_adf(0, adf::AdfConfidence::_90)?;
+
+        // if let Ok((_test_statistic, _critical_value, _sample_size)) =
+        //     nominal.perform_adf(0, adf::AdfConfidence::_90)
+        // {
+        //     println!("{}", _test_statistic < _critical_value);
+        // }
     }
 
     // let mut lag = 0;

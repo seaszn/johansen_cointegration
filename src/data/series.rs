@@ -5,10 +5,11 @@ use std::{
 
 use crate::market::types::OHLC;
 pub use num_traits::float::Float;
+pub use num_traits::int::PrimInt;
 use num_traits::zero;
 use std::f64;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Series<T: Copy + Clone>(Vec<T>);
 
 pub type FloatSeries = Series<f64>;
@@ -62,6 +63,10 @@ impl<T: Clone + Copy> Series<T> {
         }
 
         return Some(result);
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<'_, T>{
+        return self.0.iter();
     }
 
     pub fn _to_vec(&self) -> &Vec<T> {
@@ -143,15 +148,22 @@ impl<T: Copy + Clone> IndexMut<usize> for Series<T> {
     }
 }
 
-impl<T: Copy + Clone> IntoIterator for Series<T> {
-    type Item = T;
-    type IntoIter = std::vec::IntoIter<T>;
+// impl<T: Copy + Clone> IntoIterator for Series<T> {
+//     type Item = T;
+//     type IntoIter = std::vec::IntoIter<T>;
 
-    fn into_iter(self) -> Self::IntoIter {
-        return self.0.into_iter();
-    }
-}
+//     fn into_iter(self) -> Self::IntoIter {
+//         return self.0.into_iter();
+//     }
+// }
 
+// impl<T: Copy + Clone> Iterator for Series<T> {
+//     type Item;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         todo!()
+//     }
+// }
 pub trait TimeSeries {
     fn time(&self) -> Vec<i64>;
     fn open(&self) -> Series<f64>;

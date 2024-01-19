@@ -8,7 +8,7 @@ pub enum AdfConfidence {
 
 pub trait ADF<T, RHS = Series<T>> {
     fn perform_adf(
-        self,
+        &self,
         lag: usize,
         confidence: AdfConfidence,
     ) -> Result<(f64, f64, usize), String>;
@@ -16,11 +16,11 @@ pub trait ADF<T, RHS = Series<T>> {
 
 impl ADF<f64> for Series<f64> {
     fn perform_adf(
-        self,
+        &self,
         lag: usize,
         confidence: AdfConfidence,
     ) -> Result<(f64, f64, usize), String> {
-        let data = Series::from(&self.into_iter().rev().collect());
+        let data = Series::from(&self.iter().rev().collect());
         if &lag >= &(data.len() / 2 - 2) {
             return Err("ADF: Maximum lag must be less than (Length/2 - 2)".to_string());
         } else {
@@ -28,7 +28,7 @@ impl ADF<f64> for Series<f64> {
             let current_difference =
                 FloatSeries::from(&(0..observations).map(|x| data[x] - data[x + 1]).collect());
             let fst_difference =
-                FloatSeries::from(&(0..observations).map(|x| data[x + 1]).collect());
+                FloatSeries::from(&(0..observations).map(|x| *data[x + 1]).collect());
             let constant = FloatSeries::of_length(1.0, observations);
 
             let mut base_vector: Series<f64> = fst_difference.clone();
