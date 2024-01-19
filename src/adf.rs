@@ -14,7 +14,7 @@ pub trait ADF<T, RHS = Series<T>> {
     ) -> Result<(f64, f64, usize), String>;
 }
 
-impl ADF<f64> for FloatSeries {
+impl ADF<f64> for Series<f64> {
     fn perform_adf(
         self,
         lag: usize,

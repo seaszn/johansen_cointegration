@@ -3,9 +3,6 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Deserializer};
 
-use crate::data::{TimeSeries, Series};
-
-
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 pub struct OHLC {
     #[serde(deserialize_with = "deserialize_time_string")]
@@ -35,19 +32,19 @@ impl OHLC {
         return self.time;
     }
 
-    // pub fn open(&self) -> &f64 {
-    //     return &self.open;
-    // }
+    pub fn open(&self) -> &f64 {
+        return &self.open;
+    }
 
-    // pub fn high(&self) -> &f64 {
-    //     return &self.high;
-    // }
-    // pub fn low(&self) -> &f64 {
-    //     return &self.low;
-    // }
-    // pub fn close(&self) -> &f64 {
-    //     return &self.close;
-    // }
+    pub fn high(&self) -> &f64 {
+        return &self.high;
+    }
+    pub fn low(&self) -> &f64 {
+        return &self.low;
+    }
+    pub fn close(&self) -> &f64 {
+        return &self.close;
+    }
 }
 
 impl Add for OHLC {
@@ -136,23 +133,5 @@ impl DivAssign for OHLC {
         self.high /= rhs.high;
         self.low /= rhs.low;
         self.close /= rhs.close;
-    }
-}
-
-impl TimeSeries for Vec<OHLC> {
-    fn time(&self) -> Vec<i64> {
-        return self.iter().map(|x| x.time).collect();
-    }
-    fn open(&self) -> Series<f64> {
-        return Series::from(&self.iter().map(|x| x.open).collect())
-    }
-    fn high(&self) -> Series<f64> {
-        return Series::from(&self.iter().map(|x| x.high).collect())
-    }
-    fn low(&self) -> Series<f64> {
-        return Series::from(&self.iter().map(|x| x.low).collect())
-    }
-    fn close(&self) -> Series<f64>{
-        return Series::from(&self.iter().map(|x| x.close).collect())
     }
 }

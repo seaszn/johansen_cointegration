@@ -16,6 +16,8 @@ impl<'a> RollingWindow<'a> {
             position: 0,
         };
     }
+
+
 }
 
 impl<'a> Iterator for RollingWindow<'a> {
