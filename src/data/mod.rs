@@ -1,6 +1,7 @@
 mod file_stream;
 mod series;
 mod rolling_window;
+pub mod types;
 
 pub mod transformer;
 pub use rolling_window::*;

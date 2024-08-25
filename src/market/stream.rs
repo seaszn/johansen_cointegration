@@ -1,6 +1,7 @@
-use crate::data::{self, Series, TimeSeries};
 
-use super::types::OHLC;
+use crate::data::{TimeSeries, types::OHLC, Series, self};
+
+
 
 pub fn from_file(path: &str) -> Result<impl TimeSeries, Box<dyn std::error::Error>> {
     let mut result = data::read_from_csv::<OHLC>(path)?;

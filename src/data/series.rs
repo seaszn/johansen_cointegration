@@ -3,25 +3,24 @@ use std::{
     ops::{Div, Index, IndexMut, Mul, Sub},
 };
 
-use crate::market::types::OHLC;
 pub use num_traits::float::Float;
 pub use num_traits::int::PrimInt;
 use num_traits::zero;
 use std::f64;
 
+use super::types::OHLC;
+
 #[derive(Debug, Clone)]
 pub struct Series<T: Copy + Clone>(Vec<T>);
-
-pub type FloatSeries = Series<f64>;
 
 impl<T: Clone + Copy> Series<T> {
     pub fn from(data: &Vec<T>) -> Self {
         return Series(data.to_vec());
     }
 
-    pub fn empty() -> Series<T> {
-        return Series::from(&vec![]);
-    }
+    // pub fn empty() -> Series<T> {
+    //     return Series::from(&vec![]);
+    // }
 
     pub fn clone(&self) -> Series<T> {
         return Series(self.0.clone());
@@ -41,9 +40,9 @@ impl<T: Clone + Copy> Series<T> {
         }
     }
 
-    pub fn push(&mut self, value: T) {
-        self.0.push(value);
-    }
+    // pub fn push(&mut self, value: T) {
+    //     self.0.push(value);
+    // }
 
     pub fn append_vec(&mut self, data: &Vec<T>) {
         for i in 0..data.len() {
@@ -51,21 +50,29 @@ impl<T: Clone + Copy> Series<T> {
         }
     }
 
-    pub fn take(&self, start: usize, length: usize) -> Option<Series<T>> {
-        let mut result = Self::empty();
+    // pub fn take(&self, start: usize, length: usize) -> Option<Series<T>> {
+    //     let mut result = Self::empty();
 
-        if start + length > self.len() {
-            return None;
-        }
+    //     if start + length > self.len() {
+    //         return None;
+    //     }
 
-        for i in start..length + start {
-            result.push(self.0[i]);
-        }
+    //     for i in start..length + start {
+    //         result.push(self.0[i]);
+    //     }
 
-        return Some(result);
+    //     return Some(result);
+    // }
+
+    pub fn take_last(&self, length: usize) -> Series<T> {
+        return Series::from(
+            &((self.len() - length - 1)..self.len() - 1)
+                .map(|x| self.0[x])
+                .collect(),
+        );
     }
 
-    pub fn iter(&self) -> std::slice::Iter<'_, T>{
+    pub fn iter(&self) -> std::slice::Iter<'_, T> {
         return self.0.iter();
     }
 
@@ -74,7 +81,7 @@ impl<T: Clone + Copy> Series<T> {
     }
 }
 
-impl<T: Clone + Copy + Float + std::iter::Sum> Series<T> {
+impl<T: Clone + Copy + Float + std::iter::Sum<T>> Series<T> {
     pub fn normalize_sqrt(&self) -> T {
         return (0..self.len())
             .map(|x| self.0[x].powf(T::from(2.0_f64).unwrap()))
@@ -132,6 +139,14 @@ impl<T: Sum + Div<Output = T> + Sub<Output = T> + Mul<Output = T> + Copy + Clone
 
         return self;
     }
+
+    pub fn lag_differenced(&self, lag: usize) -> Series<T> {
+        if lag == 0 {
+            return self.clone();
+        } else {
+            return Series::from(&(lag..self.len()).map(|x| self[x] - self[x - lag]).collect());
+        }
+    }
 }
 
 impl<T: Copy + Clone> Index<usize> for Series<T> {
@@ -148,22 +163,7 @@ impl<T: Copy + Clone> IndexMut<usize> for Series<T> {
     }
 }
 
-// impl<T: Copy + Clone> IntoIterator for Series<T> {
-//     type Item = T;
-//     type IntoIter = std::vec::IntoIter<T>;
 
-//     fn into_iter(self) -> Self::IntoIter {
-//         return self.0.into_iter();
-//     }
-// }
-
-// impl<T: Copy + Clone> Iterator for Series<T> {
-//     type Item;
-
-//     fn next(&mut self) -> Option<Self::Item> {
-//         todo!()
-//     }
-// }
 pub trait TimeSeries {
     fn time(&self) -> Vec<i64>;
     fn open(&self) -> Series<f64>;
